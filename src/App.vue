@@ -27,27 +27,32 @@
 
             <v-divider></v-divider>
             <v-form>
-                    
-                    <v-row align="center">
-                      <v-col class="text-center" cols="12" sm="12"> 
-                        
-                        <v-text-field
+                    <v-text-field
+                          class="ml-2 mr-3"
                           type="text"
+                          v-model="msg"
                           placeholder="What's on your mind?"
                           prepend-icon="mdi-account-circle"
                           
                         ></v-text-field>
                         
-                        <v-file-input
-                        :rules="rules"
-                        accept="image/png, image/jpeg, image/bmp"
-                        placeholder="Upload Photo/Video"
-                        ></v-file-input>
-                        
+                        <v-btn raised class="ml-4 primary" @click="onFileSelect">Photo/Video</v-btn>                        
+                        <input 
+                          :rules="rules"
+                          type="file" 
+                          style="display: none" 
+                          ref="fileInput" 
+                          accept="image/*"
+                          @change="onFileSelected"
+                        >
                         <v-spacer></v-spacer>
+                    <v-row align="center">
+                      <v-col class="text-center" cols="12" sm="12"> 
+                        
+                        
                         <v-divider></v-divider>
                         <br/>
-                        <v-btn small color="info" v-on:click="readRefs">Post</v-btn>
+                        <v-btn small color="info" v-on:click="onPost">Post</v-btn>
                       </v-col>
                     </v-row>
             </v-form>
@@ -61,7 +66,7 @@
             <img src="https://picsum.photos/510/300?random" width="35" height="35">
             <h6 class="ml-2"> Karan Yadav</h6>
             </v-card-title>
-          <div class="ml-5">My First express when i become father rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr</div>
+          <div class="ml-5">{{msg}}</div>
           <v-img src="https://picsum.photos/510/300?random" aspect-ratio="2"></v-img>
         </v-card>
         <!-- Show Post section stop -->
@@ -89,15 +94,40 @@
 <script>
 export default {
   name: 'App',
-  data () {
-    return {
-
+  data: () => ({
+      msg: '',
+      image:'',
+      rules: [
+        value => !value || value.size < 2000000 || 'Uploaded item size should be less than 2 MB!',
+      ],
+    }),
+  mounted() {
+    if (localStorage.msg) {
+      this.msg = localStorage.msg;
     }
   },
   methods:{
-    readRefs:function(){
-      console.log(this.$refs.input.text);
-    }
+    onFileSelect() {
+      this.$refs.fileInput.click()
+
+    },
+    onFileSelected(event) {
+      const files =event.target.files
+      let filename=files[0].name
+      if(filename.lastIndexOf('.')<=0){
+        return alert('Please add a valid file!')
+      }
+      console.log(files,filename);
+      const fileReader = new FileReader()
+      fileReader.readAsDataURL(files[0])
+      this.image=files[0]
+      console.log(this.image);
+    },
+    onPost: function(){
+      console.log(this.msg);
+      localStorage.msg = this.msg;
+    },
+    
   }
 }
 </script>
